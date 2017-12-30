@@ -43,17 +43,6 @@ public class MainActivity extends AppCompatActivity {
         //开始使用GroupItemDecoration
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         View view = layoutInflater.inflate(R.layout.item_group,null);
-        recyclerView.addItemDecoration(new GroupItemDecoration(this, view, new GroupItemDecoration.DecorationCallback() {
-            @Override
-            public void setGroup(List<GroupItem> groupList) {
-                //设置分组
-            }
-
-            @Override
-            public void buildGroupView(View groupView, GroupItem groupItem) {
-                //构建GroupView，通过view.findViewById找到内部控件
-            }
-        }));
         recyclerView.addItemDecoration(new GroupItemDecoration(this,view,new GroupItemDecoration.DecorationCallback() {
             @Override
             public void setGroup(List<GroupItem> groupList) {
