@@ -2,6 +2,7 @@ package com.anlia.library.group;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -32,7 +33,9 @@ public class GroupItemDecoration extends RecyclerView.ItemDecoration {
     private boolean isFirst = true;
     private boolean isStickyHeader = true;//是否粘性头部
     private int groupViewHeight = 0;
-    int indexCache = -1;
+    private int indexCache = -1;
+
+    public static final String KEY_RECT = "rect123456789";//这个值随便设，只要不容易和用户设置的撞车就行
 
     public GroupItemDecoration(Context context,View groupView,DecorationCallback decorationCallback) {
         this.context = context;
@@ -91,8 +94,13 @@ public class GroupItemDecoration extends RecyclerView.ItemDecoration {
             float left = child.getLeft();
             float top = child.getTop();
 
+            float right = child.getRight();
+
             int position = parent.getChildAdapterPosition(child);
             if(groups.get(position)!=null){
+                Rect rect = new Rect((int)left,(int)(top - groupViewHeight),(int)right,(int)top);
+                groups.get(position).setData(KEY_RECT,rect);//用于判断点击范围
+
                 c.save();
                 c.translate(left,top - groupViewHeight);//将画布起点移动到之前预留空间的左上角
                 decorationCallback.buildGroupView(groupView,groups.get(position));//通过接口回调得知GroupView内部控件的数据
@@ -177,6 +185,7 @@ public class GroupItemDecoration extends RecyclerView.ItemDecoration {
         if(index<0){
             return;
         }
+
         decorationCallback.buildGroupView(groupView,groups.get(groupPositions[index]));
         measureView(groupView,parent);
         groupView.draw(canvas);
@@ -207,6 +216,31 @@ public class GroupItemDecoration extends RecyclerView.ItemDecoration {
         Arrays.sort(groupArrays);
         int result = Arrays.binarySearch(groupArrays,startPosition);
         return result;
+    }
+
+    /**
+     * 判断当前点击位置是否处于GroupItem区域
+     * @param x
+     * @param y
+     * @return
+     */
+    public GroupItem findGroupItemUnder(int x, int y){
+        Rect rect;
+        for(GroupItem groupItem:groupList){
+            rect = (Rect) groupItem.getData(KEY_RECT);
+            if(rect == null){
+                return null;
+            }
+
+            if(rect.contains(x,y)){
+                return groupItem;
+            }
+        }
+        return null;
+    }
+
+    public Context getContext(){
+        return context;
     }
 
     /**

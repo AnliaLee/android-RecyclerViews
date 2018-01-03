@@ -1,15 +1,20 @@
 package com.anlia.recyclerviews;
 
+import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.anlia.library.base.ItemClickListener;
 import com.anlia.library.group.GroupItem;
+import com.anlia.library.group.GroupItemClickListener;
 import com.anlia.library.group.GroupItemDecoration;
 
 import java.util.ArrayList;
@@ -43,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         //开始使用GroupItemDecoration
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         View view = layoutInflater.inflate(R.layout.item_group,null);
-        recyclerView.addItemDecoration(new GroupItemDecoration(this,view,new GroupItemDecoration.DecorationCallback() {
+        GroupItemDecoration groupItemDecoration = new GroupItemDecoration(this, view, new GroupItemDecoration.DecorationCallback() {
             @Override
             public void setGroup(List<GroupItem> groupList) {
                 //设置分组，例如：
@@ -73,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
             public void buildGroupView(View groupView, GroupItem groupItem) {
                 //构建GroupView，通过view.findViewById找到内部控件，例如
                 TextView textName = (TextView) groupView.findViewById(R.id.text_name);
+
+                Rect mRect = (Rect) groupItem.getData(GroupItemDecoration.KEY_RECT);
                 textName.setText(groupItem.getData("name").toString());
 
                 ImageView imageView = (ImageView) groupView.findViewById(R.id.img);
@@ -81,6 +88,33 @@ public class MainActivity extends AppCompatActivity {
                 }else {
                     imageView.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
                 }
+            }
+        });
+        recyclerView.addItemDecoration(groupItemDecoration);
+
+        recyclerView.addOnItemTouchListener(new ItemClickListener(recyclerView, new ItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+//                Log.e("test","is:"+position);
+                Toast.makeText(MainActivity.this, "点击了item:"+(position+1), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+//                Log.e("test","il:"+position);
+                Toast.makeText(MainActivity.this, "长按了item:"+(position+1), Toast.LENGTH_SHORT).show();
+            }
+        }));
+
+        recyclerView.addOnItemTouchListener(new GroupItemClickListener(groupItemDecoration,new GroupItemClickListener.OnGroupItemClickListener() {
+            @Override
+            public void onGroupItemClick(GroupItem groupItem) {
+                Toast.makeText(MainActivity.this, "点击了Group:"+groupItem.getData("name"), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onGroupItemLongClick(GroupItem groupItem) {
+                Toast.makeText(MainActivity.this, "长按了Group:"+groupItem.getData("name"), Toast.LENGTH_SHORT).show();
             }
         }));
     }
