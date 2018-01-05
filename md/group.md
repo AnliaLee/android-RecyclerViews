@@ -54,3 +54,4 @@ recyclerView.addOnItemTouchListener(new GroupItemClickListener(groupItemDecorati
 }));
 ```
 ***
+如果还是不清楚可以去看下demo

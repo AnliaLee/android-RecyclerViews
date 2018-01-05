@@ -69,12 +69,12 @@ public class TopProjectionActivity extends AppCompatActivity {
         recyclerView.addOnItemTouchListener(new TopProjectionClickListener(decoration, new TopProjectionClickListener.OnTopProjectionClickListener() {
             @Override
             public void onTopProjectionClick(View headerView, int position) {
-                Log.e("test","hs:"+position);
+                Toast.makeText(TopProjectionActivity.this, "点击了Header，对应position为："+position, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onTopProjectionLongClick(View headerView, int position) {
-                Log.e("test","hl:"+position);
+                Toast.makeText(TopProjectionActivity.this, "长按了Header，对应position为："+position, Toast.LENGTH_SHORT).show();
             }
         }));
     }

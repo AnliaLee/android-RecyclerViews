@@ -3,6 +3,7 @@ package com.anlia.library.header;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -41,6 +42,9 @@ public class TopProjectionDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
+        if(!isLinearAndVertical(parent)){//若RecyclerView类型不是LinearLayoutManager.VERTICAL，跳出（下同）
+            return;
+        }
         if(isFirst){
             measureView(view,parent);
             childViewHeight = view.getHeight();
@@ -63,6 +67,9 @@ public class TopProjectionDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
         super.onDrawOver(c, parent, state);
+        if(!isLinearAndVertical(parent)){
+            return;
+        }
 
         int childCount = parent.getChildCount();
         for (int i = 0; i < childCount; i++) {
@@ -137,5 +144,23 @@ public class TopProjectionDecoration extends RecyclerView.ItemDecoration {
 
         view.measure(childWidth, childHeight);
         view.layout(0,0,view.getMeasuredWidth(),view.getMeasuredHeight());
+    }
+
+    /**
+     * 判断LayoutManager类型，目前GroupItemDecoration仅支持LinearLayoutManager.VERTICAL
+     * @param parent
+     * @return
+     */
+    private boolean isLinearAndVertical(RecyclerView parent){
+        RecyclerView.LayoutManager layoutManager = parent.getLayoutManager();
+        if (!(layoutManager instanceof LinearLayoutManager)) {
+            return false;
+        }else {
+            if(((LinearLayoutManager) layoutManager).getOrientation()
+                    != LinearLayoutManager.VERTICAL){
+                return false;
+            }
+        }
+        return true;
     }
 }
