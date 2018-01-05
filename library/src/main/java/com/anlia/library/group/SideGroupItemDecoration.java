@@ -2,10 +2,10 @@ package com.anlia.library.group;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -19,7 +19,7 @@ import java.util.Map;
  * Created by anlia on 2017/12/27.
  */
 
-public class GroupItemDecoration extends RecyclerView.ItemDecoration implements IGroupItemDecoration{
+public class SideGroupItemDecoration extends RecyclerView.ItemDecoration implements IGroupItemDecoration{
 
     private View groupView;
     private DecorationCallback decorationCallback;
@@ -33,11 +33,12 @@ public class GroupItemDecoration extends RecyclerView.ItemDecoration implements 
     private boolean isFirst = true;
     private boolean isStickyHeader = true;//是否粘性头部
     private int groupViewHeight = 0;
+    private int groupViewWidth = 0;
     private int indexCache = -1;
 
     public static final String KEY_RECT = "rect123456789";//这个值随便设，只要不容易和用户设置的撞车就行
 
-    public GroupItemDecoration(Context context,View groupView,DecorationCallback decorationCallback) {
+    public SideGroupItemDecoration(Context context, View groupView, DecorationCallback decorationCallback) {
         this.context = context;
         this.groupView = groupView;
         this.decorationCallback = decorationCallback;
@@ -79,10 +80,7 @@ public class GroupItemDecoration extends RecyclerView.ItemDecoration implements 
             isFirst = false;
         }
 
-        int position = parent.getChildAdapterPosition(view);
-        if(groups.get(position)!=null){
-            outRect.top = groupViewHeight;//若RecyclerView中该position对应的childView之前需要绘制groupView，则为其预留空间
-        }
+        outRect.left = groupViewWidth;
     }
 
     @Override
@@ -102,11 +100,11 @@ public class GroupItemDecoration extends RecyclerView.ItemDecoration implements 
 
             int position = parent.getChildAdapterPosition(child);
             if(groups.get(position)!=null){
-                Rect rect = new Rect((int)left,(int)(top - groupViewHeight),(int)right,(int)top);
+                Rect rect = new Rect((int)(left - groupViewWidth),(int)top,(int)left,(int)(top + groupViewHeight));
                 groups.get(position).setData(KEY_RECT,rect);//用于判断点击范围
 
                 c.save();
-                c.translate(left,top - groupViewHeight);//将画布起点移动到之前预留空间的左上角
+                c.translate(left - groupViewWidth,top);//将画布起点移动到之前预留空间的左上角
                 decorationCallback.buildGroupView(groupView,groups.get(position));//通过接口回调得知GroupView内部控件的数据
                 measureView(groupView,parent);//因为内部控件设置了数据，所以需要重新测量View
                 groupView.draw(c);
@@ -147,12 +145,12 @@ public class GroupItemDecoration extends RecyclerView.ItemDecoration implements 
         if(map.get("cur")!=null){//如果当前组不为空，说明RecyclerView可见部分至少有一个GroupView
             indexCache = (int)map.get("cur");
             float curTop = (float)map.get("curTop");
-            if(curTop-groupViewHeight<=0){//保持当前组GroupView一直在顶部
+            if(curTop<=0){//保持当前组GroupView一直在顶部
                 curTop = 0;
             }else {
                 map.put("pre",(int)map.get("cur")-1);
-                if(curTop - groupViewHeight < groupViewHeight){//判断与上一组的碰撞，推动当前的顶部GroupView
-                    curTop = curTop - groupViewHeight*2;
+                if(curTop < groupViewHeight){//判断与上一组的碰撞，推动当前的顶部GroupView
+                    curTop = curTop - groupViewHeight;
                 }else {
                     curTop = 0;
                 }
@@ -161,20 +159,20 @@ public class GroupItemDecoration extends RecyclerView.ItemDecoration implements 
 
             if(map.get("next")!=null){
                 float nextTop = (float)map.get("nextTop");
-                if(nextTop - groupViewHeight < groupViewHeight){//判断与下一组的碰撞，推动当前的顶部GroupView
-                    curTop = nextTop - groupViewHeight*2;
+                if(nextTop < groupViewHeight){//判断与下一组的碰撞，推动当前的顶部GroupView
+                    curTop = nextTop - groupViewHeight;
                 }
             }
 
             c.translate(0,curTop);
             if(map.get("pre")!=null){//判断顶部childView的分组归属，绘制对应的GroupView
-                drawGroupView(c,parent,(int)map.get("pre"));
+                drawGroupView(c,parent,(int)map.get("pre"),(int)curTop);
             }else {
-                drawGroupView(c,parent,(int)map.get("cur"));
+                drawGroupView(c,parent,(int)map.get("cur"),(int)curTop);
             }
         }else {//否则当前组为空时，通过之前缓存的索引找到上一个GroupView并绘制到顶部
             c.translate(0,0);
-            drawGroupView(c,parent,indexCache);
+            drawGroupView(c,parent,indexCache,0);
         }
         c.restore();
     }
@@ -185,10 +183,15 @@ public class GroupItemDecoration extends RecyclerView.ItemDecoration implements 
      * @param parent
      * @param index
      */
-    private void drawGroupView(Canvas canvas,RecyclerView parent,int index){
+    private void drawGroupView(Canvas canvas,RecyclerView parent,int index,int curTop){
         if(index<0){
             return;
         }
+
+        Rect rect = (Rect) groups.get(groupPositions[index]).getData(KEY_RECT);
+        rect.top = curTop;
+        rect.bottom = curTop + groupViewHeight;
+        groups.get(groupPositions[index]).setData(KEY_RECT,rect);
 
         decorationCallback.buildGroupView(groupView,groups.get(groupPositions[index]));
         measureView(groupView,parent);
@@ -223,7 +226,7 @@ public class GroupItemDecoration extends RecyclerView.ItemDecoration implements 
     }
 
     @Override
-    public GroupItem findGroupItemUnder(int x, int y){
+    public GroupItem findGroupItemUnder(int x, int y) {
         Rect rect;
         for(GroupItem groupItem:groupList){
             rect = (Rect) groupItem.getData(KEY_RECT);
@@ -239,7 +242,7 @@ public class GroupItemDecoration extends RecyclerView.ItemDecoration implements 
     }
 
     @Override
-    public Context getContext(){
+    public Context getContext() {
         return context;
     }
 
@@ -269,6 +272,7 @@ public class GroupItemDecoration extends RecyclerView.ItemDecoration implements 
         view.layout(0,0,view.getMeasuredWidth(),view.getMeasuredHeight());
 
         groupViewHeight = view.getMeasuredHeight();
+        groupViewWidth = view.getMeasuredWidth();
     }
 
     /**

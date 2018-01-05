@@ -1,5 +1,6 @@
 package com.anlia.recyclerviews;
 
+import android.content.Intent;
 import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,106 +17,33 @@ import com.anlia.library.base.ItemClickListener;
 import com.anlia.library.group.GroupItem;
 import com.anlia.library.group.GroupItemClickListener;
 import com.anlia.library.group.GroupItemDecoration;
+import com.anlia.library.group.SideGroupItemDecoration;
+import com.anlia.recyclerviews.group.GroupActivity;
+import com.anlia.recyclerviews.group.SideGroupActivity;
+import com.anlia.recyclerviews.header.TopProjectionActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    RecyclerView recyclerView;
-
-    private GroupTestAdapter groupTestAdapter;
-    private List<String> list = new ArrayList<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        initData();
     }
 
-    private void initData(){
-        for (int i=0;i<30;i++){
-            list.add(i+1+"");
-        }
-
-        groupTestAdapter = new GroupTestAdapter(this,list);
-        recyclerView.setAdapter(groupTestAdapter);
-
-        //开始使用GroupItemDecoration
-        LayoutInflater layoutInflater = LayoutInflater.from(this);
-        View view = layoutInflater.inflate(R.layout.item_group,null);
-        GroupItemDecoration groupItemDecoration = new GroupItemDecoration(this, view, new GroupItemDecoration.DecorationCallback() {
-            @Override
-            public void setGroup(List<GroupItem> groupList) {
-                //设置分组，例如：
-                GroupItem groupItem;
-                int startPosition = 0;
-                for(int i=0;i<list.size();i++){
-                    if(list.get(i).equals("10")){
-                        groupItem = new GroupItem(0);
-                        groupItem.setData("name","1-10");
-                        groupList.add(groupItem);
-                        startPosition=i+1;
-                    }else if(list.get(i).equals("20")){
-                        groupItem = new GroupItem(startPosition);
-                        groupItem.setData("name","11-20");
-                        groupItem.setData("imgId",R.drawable.ic_head);
-                        groupList.add(groupItem);
-                        startPosition=i+1;
-                    }else if(list.get(i).equals("30")){
-                        groupItem = new GroupItem(startPosition);
-                        groupItem.setData("name","21-30");
-                        groupList.add(groupItem);
-                    }
-                }
-            }
-
-            @Override
-            public void buildGroupView(View groupView, GroupItem groupItem) {
-                //构建GroupView，通过view.findViewById找到内部控件，例如
-                TextView textName = (TextView) groupView.findViewById(R.id.text_name);
-
-                Rect mRect = (Rect) groupItem.getData(GroupItemDecoration.KEY_RECT);
-                textName.setText(groupItem.getData("name").toString());
-
-                ImageView imageView = (ImageView) groupView.findViewById(R.id.img);
-                if(groupItem.getData("name").equals("11-20")){
-                    imageView.setImageDrawable(getResources().getDrawable((int)groupItem.getData("imgId")));
-                }else {
-                    imageView.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
-                }
-            }
-        });
-        recyclerView.addItemDecoration(groupItemDecoration);
-
-        recyclerView.addOnItemTouchListener(new ItemClickListener(recyclerView, new ItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-//                Log.e("test","is:"+position);
-                Toast.makeText(MainActivity.this, "点击了item:"+(position+1), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-//                Log.e("test","il:"+position);
-                Toast.makeText(MainActivity.this, "长按了item:"+(position+1), Toast.LENGTH_SHORT).show();
-            }
-        }));
-
-        recyclerView.addOnItemTouchListener(new GroupItemClickListener(groupItemDecoration,new GroupItemClickListener.OnGroupItemClickListener() {
-            @Override
-            public void onGroupItemClick(GroupItem groupItem) {
-                Toast.makeText(MainActivity.this, "点击了Group:"+groupItem.getData("name"), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onGroupItemLongClick(GroupItem groupItem) {
-                Toast.makeText(MainActivity.this, "长按了Group:"+groupItem.getData("name"), Toast.LENGTH_SHORT).show();
-            }
-        }));
+    public void clickEvent(View view) {
+    	switch (view.getId()) {
+            case R.id.btn_group_default:
+                startActivity(new Intent(this, GroupActivity.class));
+                break;
+            case R.id.btn_group_side:
+                startActivity(new Intent(this, SideGroupActivity.class));
+                break;
+            case R.id.btn_top_projection:
+                startActivity(new Intent(this, TopProjectionActivity.class));
+                break;
+    	}
     }
 }

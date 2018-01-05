@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
     tools:context="com.anlia.recyclerviews.MainActivity">
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <Button
+        android:id="@+id/btn_group_default"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/gray"/>
-</RelativeLayout>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:text="分组列表（默认）"
+        android:onClick="clickEvent"/>
+    <Button
+        android:id="@+id/btn_group_side"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:text="分组列表（分组位于左侧）"
+        android:onClick="clickEvent"/>
+    <Button
+        android:id="@+id/btn_top_projection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:text="突显列表第一项（顶部投影）"
+        android:onClick="clickEvent"/>
+
+</LinearLayout>

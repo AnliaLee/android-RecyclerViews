@@ -74,7 +74,7 @@ public class GroupTestAdapter extends RecyclerView.Adapter<GroupTestAdapter.View
                 public boolean onLongClick(View v) {
                     int pos = holder.getLayoutPosition();
                     mOnItemClickListener.onItemLongClick(holder.itemView, pos);
-                    return false;
+                    return true;
                 }
             });
         }

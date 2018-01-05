@@ -16,6 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".group.GroupActivity" />
+        <activity android:name=".group.SideGroupActivity" />
+        <activity android:name=".header.TopProjectionActivity">
+        </activity>
     </application>
 
 </manifest>

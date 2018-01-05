@@ -11,7 +11,7 @@ import android.view.View;
  */
 
 public class GroupItemClickListener implements RecyclerView.OnItemTouchListener {
-    GroupItemDecoration mDecoration;
+    IGroupItemDecoration mDecoration;
     OnGroupItemClickListener mListener;
     GestureDetector mGestureDetector;
 
@@ -20,7 +20,7 @@ public class GroupItemClickListener implements RecyclerView.OnItemTouchListener 
         void onGroupItemLongClick(GroupItem groupItem);
     }
 
-    public GroupItemClickListener(final GroupItemDecoration decoration, OnGroupItemClickListener listener){
+    public GroupItemClickListener(final IGroupItemDecoration decoration, OnGroupItemClickListener listener){
         mDecoration = decoration;
         mListener = listener;
         mGestureDetector = new GestureDetector(decoration.getContext(), new GestureDetector.SimpleOnGestureListener(){
